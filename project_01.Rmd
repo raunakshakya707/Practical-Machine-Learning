@@ -14,7 +14,7 @@ Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible t
 
 <br/>
 
-#### **Creating a prediction model using Decision Tree method**
+#### **Creating a prediction model**
 
 **Loading data**
 
@@ -22,6 +22,7 @@ Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible t
 library(caret)
 library(rpart)
 library(rattle)
+library(randomForest)
 set.seed(2018)
 
 raw_train_data <- read.csv("pml-training.csv", na.strings = c("NA", "#DIV/0!", ""))
@@ -62,6 +63,8 @@ plot(
 
 The prediction of our algorithm for the test set is:
 
+**Using Decision Tree method**
+
 ```{r message=FALSE, warning=FALSE}
 model <- rpart(classe ~ ., data = final_train_data, method = "class")
 prediction <- predict(model, final_validated_data, type = "class")
@@ -76,3 +79,20 @@ print(predictfinal)
 ```
 
 Using Decision Tree method, we have found that the cross validation accuracy to be 75.33% and the out-of-sample error is therefore 24.67% so our model performs rather not so good enough and we can try out other methods like Random Forest algorithm.
+
+**Using Random Forest algorithm**
+
+```{r message=FALSE, warning=FALSE}
+model2 <- randomForest(classe ~. , data=final_train_data, method="class")
+predict2 <- predict(model2, final_validated_data, type = "class")
+predict2 <- predict(model2, final_validated_data, type = "class")
+
+predict_rf <- predict(model2, raw_test_data, type="class")
+predict_rf
+```
+
+```{r message=FALSE, warning=FALSE}
+print(confusionMatrix(predict2, final_validated_data$classe))
+```
+
+Using Random Forest algorithm, we have found that the cross validation accuracy to be 99.54% and the out-of-sample error is therefore 0.46% so our model performs rather good.

@@ -132,12 +132,13 @@ $(document).ready(function () {
 <p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.</p>
 <p><br /></p>
 </div>
-<div id="creating-a-prediction-model-using-decision-tree-method" class="section level4">
-<h4><strong>Creating a prediction model using Decision Tree method</strong></h4>
+<div id="creating-a-prediction-model" class="section level4">
+<h4><strong>Creating a prediction model</strong></h4>
 <p><strong>Loading data</strong></p>
 <pre class="r"><code>library(caret)
 library(rpart)
 library(rattle)
+library(randomForest)
 set.seed(2018)
 
 raw_train_data &lt;- read.csv(&quot;pml-training.csv&quot;, na.strings = c(&quot;NA&quot;, &quot;#DIV/0!&quot;, &quot;&quot;))
@@ -173,6 +174,7 @@ plot(
 <div id="model-training-test-set-prediction" class="section level4">
 <h4><strong>Model training &amp; Test set prediction</strong></h4>
 <p>The prediction of our algorithm for the test set is:</p>
+<p><strong>Using Decision Tree method</strong></p>
 <pre class="r"><code>model &lt;- rpart(classe ~ ., data = final_train_data, method = &quot;class&quot;)
 prediction &lt;- predict(model, final_validated_data, type = &quot;class&quot;)
 treeModel &lt;- rpart(classe ~ ., data = final_train_data, method = &quot;class&quot;)
@@ -217,6 +219,49 @@ print(predictfinal)</code></pre>
 ##  C  A  C  A  A  C  D  A  A  A  C  C  B  A  C  E  A  A  A  B 
 ## Levels: A B C D E</code></pre>
 <p>Using Decision Tree method, we have found that the cross validation accuracy to be 75.33% and the out-of-sample error is therefore 24.67% so our model performs rather not so good enough and we can try out other methods like Random Forest algorithm.</p>
+<p><strong>Using Random Forest algorithm</strong></p>
+<pre class="r"><code>model2 &lt;- randomForest(classe ~. , data=final_train_data, method=&quot;class&quot;)
+predict2 &lt;- predict(model2, final_validated_data, type = &quot;class&quot;)
+predict2 &lt;- predict(model2, final_validated_data, type = &quot;class&quot;)
+
+predict_rf &lt;- predict(model2, raw_test_data, type=&quot;class&quot;)
+predict_rf</code></pre>
+<pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+## Levels: A B C D E</code></pre>
+<pre class="r"><code>print(confusionMatrix(predict2, final_validated_data$classe))</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1672    4    0    0    0
+##          B    2 1133    4    0    0
+##          C    0    2 1022   15    0
+##          D    0    0    0  949    0
+##          E    0    0    0    0 1082
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.9954         
+##                  95% CI : (0.9933, 0.997)
+##     No Information Rate : 0.2845         
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
+##                                          
+##                   Kappa : 0.9942         
+##  Mcnemar's Test P-Value : NA             
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9988   0.9947   0.9961   0.9844   1.0000
+## Specificity            0.9991   0.9987   0.9965   1.0000   1.0000
+## Pos Pred Value         0.9976   0.9947   0.9836   1.0000   1.0000
+## Neg Pred Value         0.9995   0.9987   0.9992   0.9970   1.0000
+## Prevalence             0.2845   0.1935   0.1743   0.1638   0.1839
+## Detection Rate         0.2841   0.1925   0.1737   0.1613   0.1839
+## Detection Prevalence   0.2848   0.1935   0.1766   0.1613   0.1839
+## Balanced Accuracy      0.9989   0.9967   0.9963   0.9922   1.0000</code></pre>
+<p>Using Random Forest algorithm, we have found that the cross validation accuracy to be 99.54% and the out-of-sample error is therefore 0.46% so our model performs rather good.</p>
 </div>
 
 
