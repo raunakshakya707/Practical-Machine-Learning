@@ -1,0 +1,75 @@
+---
+title: "Practical Machine Learning - Course Project"
+author: "Raunak Shakya, Nov 2018"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+<br/>
+
+#### **Overview**
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.
+
+<br/>
+
+#### **Creating a prediction model using Decision Tree method**
+
+**Loading data**
+
+```{r message=FALSE, warning=FALSE}
+library(caret)
+library(rpart)
+library(rattle)
+set.seed(2018)
+
+raw_train_data <- read.csv("pml-training.csv", na.strings = c("NA", "#DIV/0!", ""))
+raw_test_data <- read.csv("pml-testing.csv", na.strings = c("NA", "#DIV/0!", ""))
+
+clean_train_data <- raw_train_data[, colSums(is.na(raw_train_data)) == 0]
+clean_test_data <- raw_test_data[, colSums(is.na(raw_test_data)) == 0]
+```
+
+<br/>
+
+#### **Preprocessing**
+
+#### **Partitioning the training set**
+
+We separate our training data into a training set and a validation set so that we can validate our model.
+
+```{r message=FALSE, warning=FALSE}
+reduced_train_data <- clean_train_data[, -c(1:7)]
+reduced_test_data <- clean_test_data[, -c(1:7)]
+
+sub_samples <- createDataPartition(reduced_train_data$classe, p = 0.7, list = FALSE)
+final_train_data <- reduced_train_data[sub_samples,]
+final_validated_data <- reduced_train_data[-sub_samples,]
+
+plot(
+  final_train_data$classe,
+  col = "red",
+  main = "Bar Plot of classe levels within the final_train_data dataset",
+  xlab = "classe levels",
+  ylab = "Frequency"
+)
+```
+
+<br/>
+
+#### **Model training & Test set prediction**
+
+The prediction of our algorithm for the test set is:
+
+```{r message=FALSE, warning=FALSE}
+model <- rpart(classe ~ ., data = final_train_data, method = "class")
+prediction <- predict(model, final_validated_data, type = "class")
+treeModel <- rpart(classe ~ ., data = final_train_data, method = "class")
+
+fancyRpartPlot(treeModel, sub="")
+
+confusionMatrix(prediction, final_validated_data$classe)
+```
+
+Using Decision Tree method, we have found that the cross validation accuracy to be 75.33% and the out-of-sample error is therefore 24.67% so our model performs rather not so good enough and we can try out other methods like Random Forest algorithm.
