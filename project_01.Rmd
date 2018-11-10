@@ -69,7 +69,10 @@ treeModel <- rpart(classe ~ ., data = final_train_data, method = "class")
 
 fancyRpartPlot(treeModel, sub="")
 
-confusionMatrix(prediction, final_validated_data$classe)
+print(confusionMatrix(prediction, final_validated_data$classe))
+
+predictfinal <- predict(model, raw_test_data, type="class")
+print(predictfinal)
 ```
 
 Using Decision Tree method, we have found that the cross validation accuracy to be 75.33% and the out-of-sample error is therefore 24.67% so our model performs rather not so good enough and we can try out other methods like Random Forest algorithm.
